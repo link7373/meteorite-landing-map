@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meteorite Map — Every Known Meteorite Landing on Earth</title>
+  <meta name="description" content="Explore 45,000+ meteorite landings on an interactive map. Filter by year, mass, and classification. Data from NASA and The Meteoritical Society.">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Meteorite Map — Every Known Meteorite Landing on Earth">
+  <meta property="og:description" content="Explore 45,000+ meteorite landings on an interactive map. Filter by year, mass, and classification.">
+  <meta property="og:type" content="website">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Leaflet MarkerCluster -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+  <!-- noUiSlider -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.js"></script>
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ═══ Loading Overlay ═══ -->
+  <div id="loading-overlay">
+    <div class="loader-visual">
+      <svg class="meteor-svg" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <radialGradient id="meteorGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="trailGrad" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse"
+            x1="72" y1="48" x2="10" y2="110">
+            <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <!-- Glow halo -->
+        <circle cx="78" cy="42" r="32" fill="url(#meteorGlow)" class="meteor-halo"/>
+        <!-- Trail -->
+        <path class="meteor-trail" d="M68 52 L12 108" stroke="url(#trailGrad)" stroke-width="2.5" stroke-linecap="round"/>
+        <path class="meteor-trail-2" d="M65 55 L20 112" stroke="url(#trailGrad)" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+        <!-- Body -->
+        <circle class="meteor-body" cx="78" cy="42" r="14" fill="#f59e0b"/>
+        <!-- Surface detail -->
+        <circle cx="73" cy="38" r="4" fill="#fbbf24" opacity="0.6"/>
+        <circle cx="83" cy="46" r="2.5" fill="#d97706" opacity="0.5"/>
+      </svg>
+    </div>
+    <h1 class="loader-title">Meteorite Map</h1>
+    <p id="loading-text" class="loading-text">Fetching meteorite data…</p>
+    <div class="loading-bar-wrap">
+      <div class="loading-bar"></div>
+    </div>
+    <button id="retry-btn" class="btn-retry hidden" aria-label="Retry loading data">
+      ↺ Retry
+    </button>
+  </div>
+
+  <!-- ═══ Map ═══ -->
+  <div id="map" aria-label="Interactive meteorite landing map" role="application"></div>
+
+  <!-- ═══ Sidebar Toggle ═══ -->
+  <button id="sidebar-toggle" aria-label="Open filter panel" aria-expanded="false" aria-controls="sidebar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <line x1="3" y1="12" x2="15" y2="12"/>
+      <line x1="3" y1="18" x2="9" y2="18"/>
+    </svg>
+  </button>
+
+  <!-- ═══ Filter Sidebar ═══ -->
+  <aside id="sidebar" role="complementary" aria-label="Filter panel">
+    <div class="sidebar-header">
+      <div class="sidebar-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="title-icon" aria-hidden="true">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+        </svg>
+        <span>Filters</span>
+      </div>
+      <button id="sidebar-close" aria-label="Close filter panel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="sidebar-content">
+
+      <!-- Year Range -->
+      <div class="filter-section">
+        <div class="filter-label">
+          <span>Year Range</span>
+          <span class="year-range-val">
+            <span id="year-min-val">—</span>–<span id="year-max-val">—</span>
+          </span>
+        </div>
+        <div id="year-slider" class="year-slider-el"></div>
+      </div>
+
+      <!-- Mass Category -->
+      <div class="filter-section">
+        <div class="filter-label">Mass</div>
+        <div class="mass-grid" id="mass-buttons" role="group" aria-label="Filter by mass range">
+          <button class="mass-btn active" data-mass="all" aria-pressed="true">All</button>
+          <button class="mass-btn" data-mass="tiny" aria-pressed="false">&lt; 1 g</button>
+          <button class="mass-btn" data-mass="small" aria-pressed="false">1 g – 100 g</button>
+          <button class="mass-btn" data-mass="medium" aria-pressed="false">100 g – 1 kg</button>
+          <button class="mass-btn" data-mass="large" aria-pressed="false">1 kg – 100 kg</button>
+          <button class="mass-btn" data-mass="xlarge" aria-pressed="false">100 kg – 1 t</button>
+          <button class="mass-btn" data-mass="massive" aria-pressed="false">&gt; 1 tonne</button>
+        </div>
+      </div>
+
+      <!-- Fall Type -->
+      <div class="filter-section">
+        <div class="filter-label">Fall Type</div>
+        <div class="fall-toggle" id="fall-toggle" role="group" aria-label="Filter by fall type">
+          <button class="fall-btn active" data-fall="both" aria-pressed="true">Both</button>
+          <button class="fall-btn" data-fall="Fell" aria-pressed="false">
+            <span class="dot-fell" aria-hidden="true"></span>Fell
+          </button>
+          <button class="fall-btn" data-fall="Found" aria-pressed="false">
+            <span class="dot-found" aria-hidden="true"></span>Found
+          </button>
+        </div>
+      </div>
+
+      <!-- Classification -->
+      <div class="filter-section">
+        <div class="filter-label">Classification <span class="filter-label-sub">(top 15)</span></div>
+        <div id="class-filters" class="class-list" role="group" aria-label="Filter by classification"></div>
+      </div>
+
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="filter-count" id="filter-count">— / — meteorites</div>
+      <div class="filter-actions">
+        <button id="apply-filters" class="btn-apply">Apply</button>
+        <button id="reset-filters" class="btn-reset">Reset</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══ Search ═══ -->
+  <div id="search-container" role="search">
+    <div class="search-wrapper">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input
+        id="search-input"
+        type="text"
+        placeholder="Search meteorites…"
+        autocomplete="off"
+        spellcheck="false"
+        aria-label="Search meteorites by name"
+        aria-autocomplete="list"
+        aria-controls="search-results"
+        aria-haspopup="listbox"
+      >
+      <button id="search-clear" class="search-clear hidden" aria-label="Clear search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <ul id="search-results" role="listbox" aria-label="Search suggestions" class="search-results hidden"></ul>
+  </div>
+
+  <!-- ═══ Stats Bar ═══ -->
+  <footer id="stats-bar" aria-label="Map statistics">
+    <div class="stat-item">
+      <span class="stat-label">Visible</span>
+      <span class="stat-value mono" id="stat-total">—</span>
+    </div>
+    <div class="stat-divider" aria-hidden="true"></div>
+    <div class="stat-item stat-expand">
+      <span class="stat-label">Heaviest</span>
+      <span class="stat-value mono" id="stat-heaviest" title="">—</span>
+    </div>
+    <div class="stat-divider stat-expand" aria-hidden="true"></div>
+    <div class="stat-item stat-expand">
+      <span class="stat-label">Oldest</span>
+      <span class="stat-value mono" id="stat-oldest" title="">—</span>
+    </div>
+    <div class="stat-divider" aria-hidden="true"></div>
+    <div class="stat-item">
+      <span class="dot-fell-sm" aria-hidden="true"></span>
+      <span class="stat-label">Fell</span>
+      <span class="stat-value mono" id="stat-fell">—</span>
+    </div>
+    <div class="stat-divider" aria-hidden="true"></div>
+    <div class="stat-item">
+      <span class="dot-found-sm" aria-hidden="true"></span>
+      <span class="stat-label">Found</span>
+      <span class="stat-value mono" id="stat-found">—</span>
+    </div>
+  </footer>
+
+  <!-- Scripts — order matters: data → map → filters → stats → search → app -->
+  <script src="js/data.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/filters.js"></script>
+  <script src="js/stats.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
