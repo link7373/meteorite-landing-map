@@ -35,6 +35,10 @@ const AppState = {
     AppState.filtered = getFilteredMeteorites(AppState.allMeteorites, AppState.filters);
     updateMarkers(AppState.filtered);
     updateStats(AppState.filtered);
+    // If timeline is visible, re-render at current year with new filters
+    if (typeof _tlActive !== 'undefined' && _tlActive && typeof timelineRefresh === 'function') {
+      timelineRefresh();
+    }
   },
 };
 
@@ -126,6 +130,7 @@ async function init() {
 
     initSearch();
     if (typeof initClassificationGuide === 'function') initClassificationGuide();
+    initTimeline(AppState.allMeteorites);
     updateStats(AppState.filtered);
 
     hideLoading();

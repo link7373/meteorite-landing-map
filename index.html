@@ -215,6 +215,36 @@
     <ul id="search-results" role="listbox" aria-label="Search suggestions" class="search-results hidden"></ul>
   </div>
 
+  <!-- Timeline Bar -->
+  <div id="timeline-bar" class="timeline-bar hidden" aria-label="Timeline playback controls">
+    <div class="timeline-inner">
+      <button id="tl-reset" class="tl-btn" aria-label="Reset timeline" title="Reset">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.2"/>
+        </svg>
+      </button>
+      <button id="tl-play" class="tl-btn tl-play-btn" aria-label="Play timeline" title="Play">
+        <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <svg class="icon-pause hidden" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+      </button>
+      <span class="tl-year-label" id="tl-year">—</span>
+      <div id="tl-slider" class="tl-slider-el" aria-label="Timeline year scrubber"></div>
+      <div class="tl-speed-group" role="group" aria-label="Playback speed">
+        <button class="tl-speed-btn active" data-speed="1" aria-pressed="true">1×</button>
+        <button class="tl-speed-btn" data-speed="5" aria-pressed="false">5×</button>
+        <button class="tl-speed-btn" data-speed="10" aria-pressed="false">10×</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timeline Toggle -->
+  <button id="timeline-toggle" aria-label="Toggle timeline animation" title="Timeline" aria-pressed="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+      <circle cx="12" cy="12" r="10"/>
+      <polyline points="12 6 12 12 16 14"/>
+    </svg>
+  </button>
+
   <!-- ═══ Stats Bar ═══ -->
   <footer id="stats-bar" aria-label="Map statistics">
     <div class="stat-item">
@@ -270,6 +300,7 @@
   <script src="js/search.js"></script>
   <script src="js/url.js"></script>
   <script src="js/classification.js"></script>
+  <script src="js/timeline.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
