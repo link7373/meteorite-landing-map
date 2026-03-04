@@ -28,6 +28,9 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
+  <!-- Leaflet.heat -->
+  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+
   <!-- noUiSlider -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.css">
   <script src="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.js"></script>
@@ -100,6 +103,14 @@
 
   <!-- Toast notification -->
   <div id="toast" class="toast hidden" role="alert" aria-live="polite"></div>
+
+  <!-- Heatmap Toggle -->
+  <button id="heatmap-toggle" aria-label="Toggle heatmap view" title="Toggle heatmap" aria-pressed="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+      <!-- Flame icon -->
+      <path d="M12 2C6.5 2 4 7 6 10c.5.8 1 1.5 1 2.5C7 14 5.5 15 5 16.5 4 19 6 22 12 22c6 0 8-3 7-5.5-.5-1.5-2-2.5-2-4 0-1 .5-1.7 1-2.5C20 7 17.5 2 12 2z"/>
+    </svg>
+  </button>
 
   <!-- ═══ Filter Sidebar ═══ -->
   <aside id="sidebar" role="complementary" aria-label="Filter panel">

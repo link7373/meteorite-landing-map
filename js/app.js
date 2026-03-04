@@ -64,6 +64,7 @@ function surpriseMe() {
 }
 
 document.getElementById('surprise-btn').addEventListener('click', surpriseMe);
+document.getElementById('heatmap-toggle').addEventListener('click', toggleHeatmap);
 
 /* ── Loading UI helpers ── */
 

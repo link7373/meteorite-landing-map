@@ -4,6 +4,9 @@
    map.js — Leaflet map, markers, clustering, popups
    ═══════════════════════════════════════════════════ */
 
+let _heatLayer  = null;
+let _heatActive = false;
+
 /** Initialize the Leaflet map and return the instance */
 function initMap() {
   const map = L.map('map', {
@@ -156,4 +159,49 @@ function updateMarkers(filtered) {
   });
 
   AppState.markerLayer.addLayers(toAdd);
+
+  // Rebuild heat layer if active
+  if (_heatActive && _heatLayer) {
+    _heatLayer.remove();
+    _heatLayer = buildHeatLayer(filtered);
+    _heatLayer.addTo(AppState.map);
+  }
+}
+
+/**
+ * Build a Leaflet.heat layer from a meteorite array.
+ * Mass is used as intensity (log-scaled, clamped 0–1).
+ */
+function buildHeatLayer(meteorites) {
+  const points = meteorites.map(m => {
+    const intensity = m.mass ? Math.min(Math.log10(m.mass + 1) / 7, 1) : 0.2;
+    return [m.lat, m.lng, intensity];
+  });
+  return L.heatLayer(points, {
+    radius:   18,
+    blur:     15,
+    maxZoom:  10,
+    gradient: { 0.2: '#06b6d4', 0.5: '#f59e0b', 1.0: '#ef4444' },
+  });
+}
+
+/**
+ * Toggle between cluster view and heatmap view.
+ */
+function toggleHeatmap() {
+  _heatActive = !_heatActive;
+  const btn = document.getElementById('heatmap-toggle');
+
+  if (_heatActive) {
+    AppState.map.removeLayer(AppState.markerLayer);
+    _heatLayer = buildHeatLayer(AppState.filtered);
+    _heatLayer.addTo(AppState.map);
+    btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
+  } else {
+    if (_heatLayer) { _heatLayer.remove(); _heatLayer = null; }
+    AppState.map.addLayer(AppState.markerLayer);
+    btn.classList.remove('active');
+    btn.setAttribute('aria-pressed', 'false');
+  }
 }

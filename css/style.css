@@ -289,6 +289,36 @@ body.sidebar-open #sidebar-toggle {
 .toast.hidden { display: none; }
 .toast.fading { opacity: 0; }
 
+/* ── Heatmap Toggle Button ── */
+#heatmap-toggle {
+  position: fixed;
+  left: 16px;
+  bottom: calc(var(--stats-h) + 108px);
+  z-index: 800;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: rgba(10,10,20,0.85);
+  border: 1px solid rgba(6,182,212,0.3);
+  color: #06b6d4;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  transition: background 0.2s, border-color 0.2s;
+}
+#heatmap-toggle:hover {
+  background: rgba(6,182,212,0.15);
+  border-color: #06b6d4;
+}
+#heatmap-toggle.active {
+  background: rgba(6,182,212,0.25);
+  border-color: #06b6d4;
+  color: #fff;
+}
+#heatmap-toggle svg { width: 20px; height: 20px; }
+
 /* ═══════════════════════════════════════════════════
    SIDEBAR
    ═══════════════════════════════════════════════════ */
