@@ -69,6 +69,9 @@ function surpriseMe() {
 
 document.getElementById('surprise-btn').addEventListener('click', surpriseMe);
 document.getElementById('heatmap-toggle').addEventListener('click', toggleHeatmap);
+document.getElementById('home-btn').addEventListener('click', () => {
+  AppState.map.flyTo([20, 10], 2, { animate: true, duration: 1.0 });
+});
 
 /* ── Loading UI helpers ── */
 

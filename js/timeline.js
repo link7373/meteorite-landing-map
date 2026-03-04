@@ -25,7 +25,6 @@ function initTimeline(meteorites) {
   _maxYear    = Math.max(...years);
   _currentYear = _minYear;
 
-  _initSlider();
   _initButtons();
 
   document.getElementById('timeline-toggle').addEventListener('click', _toggleTimeline);
@@ -82,6 +81,8 @@ function _toggleTimeline() {
     document.body.classList.add('timeline-open');
     btn.classList.add('active');
     btn.setAttribute('aria-pressed', 'true');
+    // Init slider lazily so it has real dimensions (not zero-width hidden element)
+    if (!_tlSlider) _initSlider();
     // Create animation layer
     _animLayer = L.layerGroup().addTo(AppState.map);
     // Render map at minYear
@@ -133,18 +134,21 @@ function _tick() {
 function _setYear(year, prevYear = null) {
   _currentYear = year;
   document.getElementById('tl-year').textContent = year;
-  _tlSlider.set(year, false);  // update handle silently
+  if (_tlSlider) _tlSlider.set(year, false);  // update handle silently
 
   // Get the base filtered set (respects all sidebar filters EXCEPT year)
   const baseFilters = { ...AppState.filters, yearMin: null, yearMax: null };
   const allVisible  = getFilteredMeteorites(AppState.allMeteorites, baseFilters)
                         .filter(m => m.year === null || m.year <= year);
 
-  // Determine new meteorites for animation (only at 1× speed, when playing)
+  // Determine new meteorites for animation (when playing)
   let toAnimate = [];
-  if (_playing && _speed === 1 && prevYear !== null) {
+  if (_playing && prevYear !== null) {
     toAnimate = allVisible.filter(m => m.year === year);
-    if (toAnimate.length > MAX_ANIM) toAnimate = [];  // too many — skip anim
+    // Too many? Random-sample instead of skipping entirely
+    if (toAnimate.length > MAX_ANIM) {
+      toAnimate = toAnimate.sort(() => Math.random() - 0.5).slice(0, MAX_ANIM);
+    }
   }
 
   updateMarkers(allVisible);
@@ -163,8 +167,8 @@ function _animateFall(m) {
   const icon = L.divIcon({
     className: '',
     html: `<div class="marker-anim-wrap"><div class="marker-anim-dot"></div></div>`,
-    iconSize:   [12, 12],
-    iconAnchor: [6, 6],
+    iconSize:   [24, 24],
+    iconAnchor: [12, 12],
   });
 
   const marker = L.marker([m.lat, m.lng], { icon, interactive: false, keyboard: false });

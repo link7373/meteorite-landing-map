@@ -157,13 +157,9 @@ function flyToMeteorite(id) {
   const marker = AppState.markerMap.get(id);
   if (!m || !marker) return;
 
-  // Fly to position
-  AppState.map.flyTo([m.lat, m.lng], 8, { animate: true, duration: 1.2 });
+  // Fly to position at zoom 12 so the marker is declustered on arrival
+  AppState.map.flyTo([m.lat, m.lng], 12, { animate: true, duration: 1.2 });
 
-  // After flight lands, de-cluster and open popup
-  setTimeout(() => {
-    AppState.markerLayer.zoomToShowLayer(marker, () => {
-      setTimeout(() => marker.openPopup(), 80);
-    });
-  }, 1300);
+  // After flight lands, open popup directly (no secondary zoom-to-17 snap)
+  setTimeout(() => marker.openPopup(), 1350);
 }
