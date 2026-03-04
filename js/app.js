@@ -38,6 +38,33 @@ const AppState = {
   },
 };
 
+/* ── Toast helper ── */
+let _toastTimer = null;
+function showToast(msg, duration = 2500) {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  clearTimeout(_toastTimer);
+  el.textContent = msg;
+  el.classList.remove('hidden', 'fading');
+  _toastTimer = setTimeout(() => {
+    el.classList.add('fading');
+    setTimeout(() => el.classList.add('hidden'), 400);
+  }, duration);
+}
+
+/* ── Surprise Me ── */
+function surpriseMe() {
+  const pool = AppState.filtered;
+  if (!pool.length) {
+    showToast('No meteorites in the current filter!');
+    return;
+  }
+  const m = pool[Math.floor(Math.random() * pool.length)];
+  flyToMeteorite(m.id);
+}
+
+document.getElementById('surprise-btn').addEventListener('click', surpriseMe);
+
 /* ── Loading UI helpers ── */
 
 function showLoading(text) {

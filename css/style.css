@@ -242,6 +242,53 @@ body.sidebar-open #sidebar-toggle {
   pointer-events: none;
 }
 
+/* ── Surprise Me Button ── */
+#surprise-btn {
+  position: fixed;
+  left: 16px;
+  bottom: calc(var(--stats-h) + 60px);
+  z-index: 800;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: rgba(10,10,20,0.85);
+  border: 1px solid rgba(245,158,11,0.3);
+  color: #f59e0b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  transition: background 0.2s, border-color 0.2s, transform 0.1s;
+}
+#surprise-btn:hover {
+  background: rgba(245,158,11,0.15);
+  border-color: #f59e0b;
+}
+#surprise-btn:active { transform: scale(0.93); }
+#surprise-btn svg { width: 20px; height: 20px; }
+
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  bottom: calc(var(--stats-h) + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1200;
+  background: rgba(10,10,20,0.9);
+  border: 1px solid rgba(245,158,11,0.4);
+  color: #e5e5e5;
+  font-size: 0.8rem;
+  padding: 8px 16px;
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.4s;
+}
+.toast.hidden { display: none; }
+.toast.fading { opacity: 0; }
+
 /* ═══════════════════════════════════════════════════
    SIDEBAR
    ═══════════════════════════════════════════════════ */
