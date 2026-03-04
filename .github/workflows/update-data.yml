@@ -1,0 +1,39 @@
+name: Update meteorite data
+
+on:
+  schedule:
+    - cron: '0 2 1 * *'   # 02:00 UTC on the 1st of every month
+  workflow_dispatch:        # allow manual trigger from GitHub UI
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write       # needed to commit and push
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Download and convert NASA data
+        run: python scripts/process_data.py
+
+      - name: Check for changes
+        id: diff
+        run: |
+          git diff --quiet data/meteorites.json && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push if changed
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          RECORDS=$(python -c "import json; d=json.load(open('data/meteorites.json')); print(len(d))")
+          git add data/meteorites.json
+          git commit -m "chore: update meteorite data (${RECORDS} records) [skip ci]"
+          git push

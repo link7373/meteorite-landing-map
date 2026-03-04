@@ -35,8 +35,40 @@ const AppState = {
     AppState.filtered = getFilteredMeteorites(AppState.allMeteorites, AppState.filters);
     updateMarkers(AppState.filtered);
     updateStats(AppState.filtered);
+    // If timeline is visible, re-render at current year with new filters
+    if (typeof _tlActive !== 'undefined' && _tlActive && typeof timelineRefresh === 'function') {
+      timelineRefresh();
+    }
   },
 };
+
+/* ── Toast helper ── */
+let _toastTimer = null;
+function showToast(msg, duration = 2500) {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  clearTimeout(_toastTimer);
+  el.textContent = msg;
+  el.classList.remove('hidden', 'fading');
+  _toastTimer = setTimeout(() => {
+    el.classList.add('fading');
+    setTimeout(() => el.classList.add('hidden'), 400);
+  }, duration);
+}
+
+/* ── Surprise Me ── */
+function surpriseMe() {
+  const pool = AppState.filtered;
+  if (!pool.length) {
+    showToast('No meteorites in the current filter!');
+    return;
+  }
+  const m = pool[Math.floor(Math.random() * pool.length)];
+  flyToMeteorite(m.id);
+}
+
+document.getElementById('surprise-btn').addEventListener('click', surpriseMe);
+document.getElementById('heatmap-toggle').addEventListener('click', toggleHeatmap);
 
 /* ── Loading UI helpers ── */
 
@@ -85,9 +117,21 @@ async function init() {
     AppState.map.addLayer(AppState.markerLayer);
 
     // Phase 3–5 — filters, stats, search
-    initFilters(AppState.allMeteorites);
+    const urlFilters = typeof readURLParams === 'function' ? readURLParams() : {};
+    initFilters(AppState.allMeteorites, urlFilters);
+
+    // Apply URL filters to AppState immediately
+    if (Object.keys(urlFilters).length > 0) {
+      AppState.filters = { ...AppState.filters, ...urlFilters };
+      AppState.filtered = getFilteredMeteorites(AppState.allMeteorites, AppState.filters);
+      updateMarkers(AppState.filtered);
+      updateStats(AppState.filtered);
+    }
+
     initSearch();
-    updateStats(AppState.allMeteorites);
+    if (typeof initClassificationGuide === 'function') initClassificationGuide();
+    initTimeline(AppState.allMeteorites);
+    updateStats(AppState.filtered);
 
     hideLoading();
   } catch (err) {

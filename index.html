@@ -28,6 +28,9 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
+  <!-- Leaflet.heat -->
+  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+
   <!-- noUiSlider -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.css">
   <script src="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.js"></script>
@@ -82,6 +85,30 @@
       <line x1="3" y1="6" x2="21" y2="6"/>
       <line x1="3" y1="12" x2="15" y2="12"/>
       <line x1="3" y1="18" x2="9" y2="18"/>
+    </svg>
+  </button>
+
+  <!-- Surprise Me Button -->
+  <button id="surprise-btn" aria-label="Fly to a random meteorite" title="Surprise me!">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+      <!-- Dice icon: dots on a rounded square -->
+      <rect x="2" y="2" width="20" height="20" rx="4"/>
+      <circle cx="8"  cy="8"  r="1.2" fill="currentColor" stroke="none"/>
+      <circle cx="16" cy="8"  r="1.2" fill="currentColor" stroke="none"/>
+      <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/>
+      <circle cx="8"  cy="16" r="1.2" fill="currentColor" stroke="none"/>
+      <circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/>
+    </svg>
+  </button>
+
+  <!-- Toast notification -->
+  <div id="toast" class="toast hidden" role="alert" aria-live="polite"></div>
+
+  <!-- Heatmap Toggle -->
+  <button id="heatmap-toggle" aria-label="Toggle heatmap view" title="Toggle heatmap" aria-pressed="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+      <!-- Flame icon -->
+      <path d="M12 2C6.5 2 4 7 6 10c.5.8 1 1.5 1 2.5C7 14 5.5 15 5 16.5 4 19 6 22 12 22c6 0 8-3 7-5.5-.5-1.5-2-2.5-2-4 0-1 .5-1.7 1-2.5C20 7 17.5 2 12 2z"/>
     </svg>
   </button>
 
@@ -188,6 +215,36 @@
     <ul id="search-results" role="listbox" aria-label="Search suggestions" class="search-results hidden"></ul>
   </div>
 
+  <!-- Timeline Bar -->
+  <div id="timeline-bar" class="timeline-bar hidden" aria-label="Timeline playback controls">
+    <div class="timeline-inner">
+      <button id="tl-reset" class="tl-btn" aria-label="Reset timeline" title="Reset">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.2"/>
+        </svg>
+      </button>
+      <button id="tl-play" class="tl-btn tl-play-btn" aria-label="Play timeline" title="Play">
+        <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <svg class="icon-pause hidden" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+      </button>
+      <span class="tl-year-label" id="tl-year">—</span>
+      <div id="tl-slider" class="tl-slider-el" aria-label="Timeline year scrubber"></div>
+      <div class="tl-speed-group" role="group" aria-label="Playback speed">
+        <button class="tl-speed-btn active" data-speed="1" aria-pressed="true">1×</button>
+        <button class="tl-speed-btn" data-speed="5" aria-pressed="false">5×</button>
+        <button class="tl-speed-btn" data-speed="10" aria-pressed="false">10×</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timeline Toggle -->
+  <button id="timeline-toggle" aria-label="Toggle timeline animation" title="Timeline" aria-pressed="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+      <circle cx="12" cy="12" r="10"/>
+      <polyline points="12 6 12 12 16 14"/>
+    </svg>
+  </button>
+
   <!-- ═══ Stats Bar ═══ -->
   <footer id="stats-bar" aria-label="Map statistics">
     <div class="stat-item">
@@ -218,12 +275,32 @@
     </div>
   </footer>
 
-  <!-- Scripts — order matters: data → map → filters → stats → search → app -->
+  <!-- Classification Guide Modal -->
+  <div id="class-modal" class="class-modal hidden" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="class-modal-title">
+    <div class="class-modal-content">
+      <button id="class-modal-close" class="class-modal-close" aria-label="Close classification guide">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+      <h2 id="class-modal-title" class="class-modal-title"></h2>
+      <div id="class-modal-body" class="class-modal-body"></div>
+      <a id="class-modal-wiki-link" class="class-modal-wiki-link" href="#" target="_blank" rel="noopener noreferrer">
+        Read more on Wikipedia →
+      </a>
+    </div>
+  </div>
+
+  <!-- Scripts — order matters: data → map → filters → stats → search → url → classification → timeline → app -->
   <script src="js/data.js"></script>
   <script src="js/map.js"></script>
   <script src="js/filters.js"></script>
   <script src="js/stats.js"></script>
   <script src="js/search.js"></script>
+  <script src="js/url.js"></script>
+  <script src="js/classification.js"></script>
+  <script src="js/timeline.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
