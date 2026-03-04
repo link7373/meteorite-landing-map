@@ -19,11 +19,11 @@ let _yearSliderMin = 0;
 let _yearSliderMax = 9999;
 
 /** Set up all filter UI and wire events */
-function initFilters(meteorites) {
-  _initYearSlider(meteorites);
-  _initMassButtons();
-  _initFallToggle();
-  _initClassCheckboxes(meteorites);
+function initFilters(meteorites, initialValues = {}) {
+  _initYearSlider(meteorites, initialValues);
+  _initMassButtons(initialValues);
+  _initFallToggle(initialValues);
+  _initClassCheckboxes(meteorites, initialValues);
   _initSidebarToggle();
 
   document.getElementById('apply-filters').addEventListener('click', applyFilters);
@@ -32,14 +32,17 @@ function initFilters(meteorites) {
   updateFilterCount(meteorites.length, meteorites.length);
 }
 
-function _initYearSlider(meteorites) {
+function _initYearSlider(meteorites, initialValues) {
   const years = meteorites.filter(m => m.year !== null).map(m => m.year);
   _yearSliderMin = Math.min(...years);
   _yearSliderMax = Math.max(...years);
 
+  const startMin = initialValues.yearMin ?? _yearSliderMin;
+  const startMax = initialValues.yearMax ?? _yearSliderMax;
+
   const sliderEl = document.getElementById('year-slider');
   _yearSlider = noUiSlider.create(sliderEl, {
-    start:  [_yearSliderMin, _yearSliderMax],
+    start:  [startMin, startMax],
     connect: true,
     range:  { min: _yearSliderMin, max: _yearSliderMax },
     step:   1,
@@ -50,8 +53,8 @@ function _initYearSlider(meteorites) {
   const minEl = document.getElementById('year-min-val');
   const maxEl = document.getElementById('year-max-val');
 
-  minEl.textContent = _yearSliderMin;
-  maxEl.textContent = _yearSliderMax;
+  minEl.textContent = startMin;
+  maxEl.textContent = startMax;
 
   _yearSlider.on('update', values => {
     minEl.textContent = values[0];
@@ -59,7 +62,13 @@ function _initYearSlider(meteorites) {
   });
 }
 
-function _initMassButtons() {
+function _initMassButtons(initialValues) {
+  const initial = initialValues.massCategory || 'all';
+  document.querySelectorAll('.mass-btn').forEach(b => {
+    const isActive = b.dataset.mass === initial;
+    b.classList.toggle('active', isActive);
+    b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+  });
   document.getElementById('mass-buttons').addEventListener('click', e => {
     const btn = e.target.closest('.mass-btn');
     if (!btn) return;
@@ -72,7 +81,13 @@ function _initMassButtons() {
   });
 }
 
-function _initFallToggle() {
+function _initFallToggle(initialValues) {
+  const initial = initialValues.fallType || 'both';
+  document.querySelectorAll('.fall-btn').forEach(b => {
+    const isActive = b.dataset.fall === initial;
+    b.classList.toggle('active', isActive);
+    b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+  });
   document.getElementById('fall-toggle').addEventListener('click', e => {
     const btn = e.target.closest('.fall-btn');
     if (!btn) return;
@@ -85,7 +100,9 @@ function _initFallToggle() {
   });
 }
 
-function _initClassCheckboxes(meteorites) {
+function _initClassCheckboxes(meteorites, initialValues) {
+  const initialClasses = initialValues.classes || [];
+
   // Count occurrences per class
   const counts = {};
   meteorites.forEach(m => {
@@ -107,6 +124,8 @@ function _initClassCheckboxes(meteorites) {
       `<input type="checkbox" id="${escapeHtml(safeId)}" value="${escapeHtml(cls)}" aria-label="Filter by ${escapeHtml(cls)}">` +
       `<span class="cls-name">${escapeHtml(cls)}</span>` +
       `<span class="class-count">${count.toLocaleString()}</span>`;
+    const checkbox = item.querySelector('input');
+    if (initialClasses.includes(cls)) checkbox.checked = true;
     container.appendChild(item);
   });
 }
@@ -156,6 +175,7 @@ function applyFilters() {
   };
 
   AppState.onFilterChange();
+  if (typeof writeURLParams === 'function') writeURLParams(AppState.filters);
 }
 
 /** Reset all filters to defaults */
@@ -186,6 +206,7 @@ function resetFilters() {
   };
 
   AppState.onFilterChange();
+  if (typeof writeURLParams === 'function') writeURLParams({});
 }
 
 /**

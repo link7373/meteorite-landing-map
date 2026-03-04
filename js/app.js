@@ -85,9 +85,19 @@ async function init() {
     AppState.map.addLayer(AppState.markerLayer);
 
     // Phase 3–5 — filters, stats, search
-    initFilters(AppState.allMeteorites);
+    const urlFilters = typeof readURLParams === 'function' ? readURLParams() : {};
+    initFilters(AppState.allMeteorites, urlFilters);
+
+    // Apply URL filters to AppState immediately
+    if (Object.keys(urlFilters).length > 0) {
+      AppState.filters = { ...AppState.filters, ...urlFilters };
+      AppState.filtered = getFilteredMeteorites(AppState.allMeteorites, AppState.filters);
+      updateMarkers(AppState.filtered);
+      updateStats(AppState.filtered);
+    }
+
     initSearch();
-    updateStats(AppState.allMeteorites);
+    updateStats(AppState.filtered);
 
     hideLoading();
   } catch (err) {
