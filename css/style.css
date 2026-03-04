@@ -1013,3 +1013,100 @@ body.sidebar-open #sidebar { transform: translateX(0); }
   .stat-item.stat-expand { display: none; }
   .stat-divider.stat-expand { display: none; }
 }
+
+/* ── Classification Tooltip ── */
+.cls-tooltip {
+  position: absolute;
+  z-index: 2000;
+  background: rgba(10,10,20,0.95);
+  border: 1px solid rgba(245,158,11,0.4);
+  color: #e5e5e5;
+  font-size: 0.75rem;
+  padding: 6px 10px;
+  border-radius: 6px;
+  max-width: 280px;
+  pointer-events: none;
+  display: none;
+  line-height: 1.4;
+}
+
+/* ── Clickable class trigger ── */
+.cls-trigger {
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-decoration: underline dotted rgba(245,158,11,0.5);
+}
+.cls-trigger:hover { color: #f59e0b; text-decoration-color: #f59e0b; }
+
+/* ── Classification Modal ── */
+.class-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.class-modal.hidden { display: none; }
+
+.class-modal-content {
+  position: relative;
+  background: #0f1017;
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: 12px;
+  padding: 28px 32px;
+  max-width: 520px;
+  width: calc(100% - 32px);
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.class-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  padding: 4px;
+}
+.class-modal-close:hover { color: #e5e5e5; }
+.class-modal-close svg { width: 20px; height: 20px; display: block; }
+
+.class-modal-title {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 1.4rem;
+  color: #f59e0b;
+  margin: 0 0 16px 0;
+}
+
+.cls-detail {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 16px;
+  margin: 0 0 16px 0;
+  font-size: 0.85rem;
+}
+.cls-detail dt { color: #888; font-weight: 500; }
+.cls-detail dd { color: #e5e5e5; margin: 0; }
+
+.cls-wiki-loading { color: #888; font-size: 0.82rem; font-style: italic; }
+.cls-wiki-extract { color: #c8c8c8; font-size: 0.85rem; line-height: 1.6; margin: 0; }
+.cls-wiki-none    { color: #666; font-size: 0.82rem; font-style: italic; }
+.cls-unknown      { color: #888; font-size: 0.85rem; }
+
+.class-modal-wiki-link {
+  display: inline-block;
+  margin-top: 16px;
+  color: #06b6d4;
+  font-size: 0.82rem;
+  text-decoration: none;
+}
+.class-modal-wiki-link:hover { text-decoration: underline; }

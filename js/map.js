@@ -67,7 +67,7 @@ function buildPopupHTML(m) {
         <h3 class="popup-name">${escapeHtml(m.name)}</h3>
         <span class="popup-badge ${badgeClass}">${escapeHtml(m.fall)}</span>
       </div>
-      <div class="popup-class">${escapeHtml(m.recclass)}</div>
+      <button class="popup-class cls-trigger" data-class="${escapeHtml(m.recclass)}" aria-label="Learn about ${escapeHtml(m.recclass)}">${escapeHtml(m.recclass)}</button>
       <div class="popup-grid">
         <div class="popup-stat">
           <span class="popup-stat-label">Mass</span>

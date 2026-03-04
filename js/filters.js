@@ -122,7 +122,7 @@ function _initClassCheckboxes(meteorites, initialValues) {
     item.htmlFor = safeId;
     item.innerHTML =
       `<input type="checkbox" id="${escapeHtml(safeId)}" value="${escapeHtml(cls)}" aria-label="Filter by ${escapeHtml(cls)}">` +
-      `<span class="cls-name">${escapeHtml(cls)}</span>` +
+      `<span class="cls-name cls-trigger" data-class="${escapeHtml(cls)}">${escapeHtml(cls)}</span>` +
       `<span class="class-count">${count.toLocaleString()}</span>`;
     const checkbox = item.querySelector('input');
     if (initialClasses.includes(cls)) checkbox.checked = true;

@@ -125,6 +125,7 @@ async function init() {
     }
 
     initSearch();
+    if (typeof initClassificationGuide === 'function') initClassificationGuide();
     updateStats(AppState.filtered);
 
     hideLoading();
