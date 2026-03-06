@@ -850,15 +850,6 @@ body.sidebar-open #sidebar { transform: translateX(0); }
 }
 .stat-value.mono { font-family: var(--mono); }
 
-.affiliate-disclosure {
-  font-size: 0.68rem;
-  color: var(--text-dim);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-width: 0;
-  padding: 0 4px;
-}
 
 .stat-divider {
   width: 1px;
@@ -1066,8 +1057,6 @@ body.sidebar-open #sidebar { transform: translateX(0); }
   .stat-item { padding: 0 8px; }
   .stat-item.stat-expand { display: none; }
   .stat-divider.stat-expand { display: none; }
-  .affiliate-disclosure { display: none; }
-  .stat-affiliate-divider { display: none; }
 }
 
 /* ── Classification Tooltip ── */
