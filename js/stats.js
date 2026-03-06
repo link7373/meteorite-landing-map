@@ -6,11 +6,13 @@
 
 /**
  * Recalculate and render all stat values from the given meteorite array.
+ * @param {Array}  meteorites  - meteorites currently in the viewport
+ * @param {number} [filterTotal] - total matching active filters (denominator); defaults to allMeteorites.length
  * formatMass() is defined in map.js (loaded before stats.js).
  */
-function updateStats(meteorites) {
+function updateStats(meteorites, filterTotal) {
   const total    = meteorites.length;
-  const totalAll = AppState.allMeteorites.length;
+  const totalAll = filterTotal !== undefined ? filterTotal : AppState.allMeteorites.length;
 
   // ── Visible count ──
   _setText('stat-total', `${total.toLocaleString()} / ${totalAll.toLocaleString()}`);

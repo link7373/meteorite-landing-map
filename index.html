@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.css">
   <script src="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.js"></script>
 
-  <link rel="stylesheet" href="css/style.css?v=3">
+  <link rel="stylesheet" href="css/style.css?v=4">
 </head>
 <body>
 
@@ -106,9 +106,17 @@
 
   <!-- Heatmap Toggle -->
   <button id="heatmap-toggle" aria-label="Toggle heatmap view" title="Toggle heatmap" aria-pressed="false">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-      <!-- Flame icon -->
-      <path d="M12 2C6.5 2 4 7 6 10c.5.8 1 1.5 1 2.5C7 14 5.5 15 5 16.5 4 19 6 22 12 22c6 0 8-3 7-5.5-.5-1.5-2-2.5-2-4 0-1 .5-1.7 1-2.5C20 7 17.5 2 12 2z"/>
+    <svg viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">
+      <path d="M17.66 11.2c-.23-.3-.51-.56-.77-.82-.67-.6-1.43-1.03-2.07-1.66C13.33 7.26 13 4.85 13.95 3c-.95.23-1.78.75-2.45 1.32C9 6.4 8 10.02 9.13 13.1c.04.11.08.22.08.36 0 .25-.19.47-.42.55-.28.09-.54.01-.74-.18-.06-.06-.1-.13-.13-.2C7 11.72 7.2 9.46 8.47 7.67c-1.38 1.25-2.15 3.25-2.07 5.22.04.71.16 1.41.39 2.08.23.71.61 1.37 1.1 1.95 1.07 1.26 2.68 2.05 4.3 2.07 1.7.03 3.32-.72 4.43-2.01 1.12-1.31 1.57-3.05 1.35-4.76l-.05-.36c-.07-.23-.15-.46-.27-.66z"/>
+    </svg>
+  </button>
+
+  <!-- About Button -->
+  <button id="about-btn" aria-label="About this site" title="About">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="8.5" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="12" y1="11.5" x2="12" y2="16"/>
     </svg>
   </button>
 
@@ -303,15 +311,40 @@
     </div>
   </div>
 
+  <!-- About Modal -->
+  <div id="about-modal" class="about-modal hidden" role="dialog" aria-modal="true" aria-labelledby="about-modal-title">
+    <div class="about-modal-content">
+      <button id="about-modal-close" class="about-modal-close" aria-label="Close about panel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+      <h2 id="about-modal-title" class="about-modal-title">☄️ Meteorite Map</h2>
+      <p class="about-desc">Every known meteorite landing on Earth, plotted on an interactive map. Explore 32,000+ confirmed impact sites, filter by year, mass, and type, and watch the history of falls unfold over time.</p>
+      <div class="about-section">
+        <h3>Data Source</h3>
+        <p>Meteorite data from <a href="https://data.nasa.gov" target="_blank" rel="noopener noreferrer">NASA Open Data</a> via <a href="https://www.lpi.usra.edu/meteor/metbull.php" target="_blank" rel="noopener noreferrer">The Meteoritical Society</a>. Updated automatically each month.</p>
+      </div>
+      <div class="about-section">
+        <h3>Affiliate Links</h3>
+        <p>Some links (like the eBay specimen search in each popup) are affiliate links. We may earn a small commission at no extra cost to you — this helps keep the map running.</p>
+      </div>
+      <div class="about-section about-footer">
+        <span class="about-credit">Created by <strong>J Colin Beck</strong></span>
+        <a href="https://buymeacoffee.com/jcolinbeck" target="_blank" rel="noopener noreferrer" class="bmc-btn">☕ Buy me a coffee</a>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts — order matters: data → map → filters → stats → search → url → classification → timeline → app -->
-  <script src="js/data.js?v=2"></script>
-  <script src="js/map.js?v=2"></script>
-  <script src="js/filters.js?v=2"></script>
-  <script src="js/stats.js?v=2"></script>
-  <script src="js/search.js?v=2"></script>
-  <script src="js/url.js?v=2"></script>
-  <script src="js/classification.js?v=2"></script>
-  <script src="js/timeline.js?v=2"></script>
-  <script src="js/app.js?v=2"></script>
+  <script src="js/data.js?v=3"></script>
+  <script src="js/map.js?v=3"></script>
+  <script src="js/filters.js?v=3"></script>
+  <script src="js/stats.js?v=3"></script>
+  <script src="js/search.js?v=3"></script>
+  <script src="js/url.js?v=3"></script>
+  <script src="js/classification.js?v=3"></script>
+  <script src="js/timeline.js?v=3"></script>
+  <script src="js/app.js?v=3"></script>
 </body>
 </html>

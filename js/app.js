@@ -34,13 +34,24 @@ const AppState = {
   onFilterChange() {
     AppState.filtered = getFilteredMeteorites(AppState.allMeteorites, AppState.filters);
     updateMarkers(AppState.filtered);
-    updateStats(AppState.filtered);
+    refreshViewportStats();
     // If timeline is visible, re-render at current year with new filters
     if (typeof _tlActive !== 'undefined' && _tlActive && typeof timelineRefresh === 'function') {
       timelineRefresh();
     }
   },
 };
+
+/* ── Viewport stats helpers ── */
+function getViewportMeteorites() {
+  if (!AppState.map) return AppState.filtered;
+  const bounds = AppState.map.getBounds();
+  return AppState.filtered.filter(m => bounds.contains([m.lat, m.lng]));
+}
+
+function refreshViewportStats() {
+  updateStats(getViewportMeteorites(), AppState.filtered.length);
+}
 
 /* ── Toast helper ── */
 let _toastTimer = null;
@@ -63,9 +74,31 @@ function surpriseMe() {
     showToast('No meteorites in the current filter!');
     return;
   }
-  const m = pool[Math.floor(Math.random() * pool.length)];
-  flyToMeteorite(m.id);
+  const m      = pool[Math.floor(Math.random() * pool.length)];
+  const marker = AppState.markerMap.get(m.id);
+  if (!marker) return;
+  // Fly to a comfortable regional zoom, then de-cluster and open popup
+  AppState.map.flyTo([m.lat, m.lng], 6, { animate: true, duration: 1.2 });
+  setTimeout(() => {
+    AppState.markerLayer.zoomToShowLayer(marker, () => {
+      setTimeout(() => marker.openPopup(), 200);
+    });
+  }, 1400);
 }
+
+/* ── About Modal ── */
+function toggleAbout() {
+  const modal = document.getElementById('about-modal');
+  const isHidden = modal.classList.contains('hidden');
+  modal.classList.toggle('hidden', !isHidden);
+  modal.setAttribute('aria-hidden', isHidden ? 'false' : 'true');
+}
+
+document.getElementById('about-btn').addEventListener('click', toggleAbout);
+document.getElementById('about-modal-close').addEventListener('click', toggleAbout);
+document.getElementById('about-modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) toggleAbout();
+});
 
 document.getElementById('surprise-btn').addEventListener('click', surpriseMe);
 document.getElementById('heatmap-toggle').addEventListener('click', toggleHeatmap);
@@ -128,13 +161,15 @@ async function init() {
       AppState.filters = { ...AppState.filters, ...urlFilters };
       AppState.filtered = getFilteredMeteorites(AppState.allMeteorites, AppState.filters);
       updateMarkers(AppState.filtered);
-      updateStats(AppState.filtered);
     }
 
     initSearch();
     if (typeof initClassificationGuide === 'function') initClassificationGuide();
     initTimeline(AppState.allMeteorites);
-    updateStats(AppState.filtered);
+
+    // Update stats whenever the viewport changes
+    AppState.map.on('moveend zoomend', refreshViewportStats);
+    refreshViewportStats();
 
     hideLoading();
   } catch (err) {
