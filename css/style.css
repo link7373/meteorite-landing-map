@@ -793,6 +793,7 @@ body.sidebar-open #sidebar { transform: translateX(0); }
   display: flex;
   align-items: center;
   padding: 0 18px;
+  overflow: hidden;
 }
 
 .stat-item {
@@ -824,6 +825,16 @@ body.sidebar-open #sidebar { transform: translateX(0); }
   text-overflow: ellipsis;
 }
 .stat-value.mono { font-family: var(--mono); }
+
+.affiliate-disclosure {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  padding: 0 4px;
+}
 
 .stat-divider {
   width: 1px;
@@ -926,6 +937,23 @@ body.sidebar-open #sidebar { transform: translateX(0); }
   border-top: 1px solid rgba(255,255,255,0.055);
 }
 
+.ebay-link {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  color: #8ab4f8;
+  text-decoration: none;
+  border: 1px solid rgba(138,180,248,0.25);
+  border-radius: var(--radius-sm);
+  transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+}
+.ebay-link:hover {
+  background: rgba(138,180,248,0.1);
+  border-color: rgba(138,180,248,0.55);
+  color: #aecbfa;
+}
+
 /* ═══════════════════════════════════════════════════
    CLUSTER ICONS
    ═══════════════════════════════════════════════════ */
@@ -1012,6 +1040,8 @@ body.sidebar-open #sidebar { transform: translateX(0); }
   .stat-item { padding: 0 8px; }
   .stat-item.stat-expand { display: none; }
   .stat-divider.stat-expand { display: none; }
+  .affiliate-disclosure { display: none; }
+  .stat-affiliate-divider { display: none; }
 }
 
 /* ── Classification Tooltip ── */
