@@ -245,27 +245,25 @@ body.sidebar-open #sidebar-toggle {
 /* ── About Button ── */
 #about-btn {
   position: fixed;
-  top: calc(50% + 75px);
-  left: 14px;
-  z-index: 400;
-  width: 42px;
-  height: 42px;
-  background: var(--panel-bg);
-  border: 1px solid var(--panel-border);
-  border-radius: var(--radius);
+  left: 16px;
+  bottom: calc(var(--stats-h) + 8px);
+  z-index: 800;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: rgba(10,10,20,0.85);
+  border: 1px solid rgba(6,182,212,0.3);
+  color: #06b6d4;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-muted);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  transition: color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+  backdrop-filter: blur(8px);
+  transition: background var(--t-fast), border-color var(--t-fast), box-shadow var(--t-fast);
 }
 #about-btn svg { width: 18px; height: 18px; }
 #about-btn:hover {
-  color: var(--cyan);
-  border-color: var(--cyan-dim);
-  box-shadow: 0 0 14px var(--cyan-glow);
+  background: rgba(6,182,212,0.15);
+  border-color: #06b6d4;
 }
 
 /* ── Surprise Me Button ── */
@@ -351,7 +349,7 @@ body.sidebar-open #sidebar-toggle {
 #sidebar {
   position: fixed;
   top: 0;
-  left: 0;
+  left: 70px;
   bottom: 0;
   width: var(--sidebar-w);
   z-index: 500;
@@ -359,7 +357,7 @@ body.sidebar-open #sidebar-toggle {
   border-right: 1px solid var(--panel-border);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  transform: translateX(calc(-1 * var(--sidebar-w) - 2px));
+  transform: translateX(calc(-1 * var(--sidebar-w) - 72px));
   transition: transform var(--t-slow) var(--ease);
   display: flex;
   flex-direction: column;
@@ -1044,6 +1042,8 @@ body.sidebar-open #sidebar { transform: translateX(0); }
     transform: translateY(100%);
   }
   body.sidebar-open #sidebar { transform: translateY(0); }
+
+  #about-btn { display: none; }
 
   /* Move toggle to above stats bar */
   #sidebar-toggle {
