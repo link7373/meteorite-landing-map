@@ -242,6 +242,32 @@ body.sidebar-open #sidebar-toggle {
   pointer-events: none;
 }
 
+/* ── About Button ── */
+#about-btn {
+  position: fixed;
+  top: calc(50% + 75px);
+  left: 14px;
+  z-index: 400;
+  width: 42px;
+  height: 42px;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+}
+#about-btn svg { width: 18px; height: 18px; }
+#about-btn:hover {
+  color: var(--cyan);
+  border-color: var(--cyan-dim);
+  box-shadow: 0 0 14px var(--cyan-glow);
+}
+
 /* ── Surprise Me Button ── */
 #surprise-btn {
   position: fixed;
