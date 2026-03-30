@@ -22,6 +22,16 @@
   --cyan-glow:    rgba(6, 182, 212, 0.20);
   --cyan-bg:      rgba(6, 182, 212, 0.10);
 
+  --rose:      #f43f5e;
+  --rose-dim:  rgba(244, 63, 94, 0.55);
+  --rose-glow: rgba(244, 63, 94, 0.20);
+  --rose-bg:   rgba(244, 63, 94, 0.10);
+
+  --brown:     #a16207;
+  --brown-dim: rgba(161, 98, 7, 0.55);
+  --brown-glow:rgba(161, 98, 7, 0.20);
+  --brown-bg:  rgba(161, 98, 7, 0.10);
+
   --text:         #e5e5e5;
   --text-muted:   #8a8a9a;
   --text-dim:     #4a4a5a;
@@ -914,6 +924,16 @@ body.sidebar-open #sidebar { transform: translateX(0); }
 }
 .popup-badge.fell  { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-dim); }
 .popup-badge.found { background: var(--cyan-bg);   color: var(--cyan);   border: 1px solid var(--cyan-dim);   }
+.popup-badge.fireball-badge { background: var(--rose-bg); color: var(--rose); border: 1px solid var(--rose-dim); }
+.popup-badge.crater-badge   { background: var(--brown-bg); color: var(--brown); border: 1px solid var(--brown-dim); }
+
+.fireball-note {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  font-style: italic;
+  margin-top: 8px;
+  line-height: 1.4;
+}
 
 .popup-class {
   font-family: var(--mono);
@@ -1005,6 +1025,66 @@ body.sidebar-open #sidebar { transform: translateX(0); }
   width: 52px !important; height: 52px !important; font-size: 12px;
   border-color: rgba(245, 158, 11, 0.7);
   box-shadow: 0 0 20px var(--accent-glow);
+}
+
+/* ═══════════════════════════════════════════════════
+   FIREBALL MARKERS
+   ═══════════════════════════════════════════════════ */
+.fireball-marker {
+  position: relative;
+  border-radius: 50%;
+  background: var(--rose);
+  box-shadow: 0 0 6px var(--rose-glow);
+}
+.fireball-marker::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--rose);
+  animation: fireball-pulse 2s ease-out infinite;
+}
+@keyframes fireball-pulse {
+  0%   { transform: scale(1);   opacity: 0.9; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* ═══════════════════════════════════════════════════
+   CRATER MARKERS
+   ═══════════════════════════════════════════════════ */
+.crater-marker {
+  border-radius: 50%;
+  background: transparent;
+  border: 3px solid var(--brown);
+  box-shadow: inset 0 0 6px rgba(161,98,7,0.3), 0 0 8px var(--brown-glow);
+}
+
+/* ── Fireball cluster icons ── */
+.fireball-cluster {
+  background: var(--panel-bg);
+  border: 1px solid rgba(244, 63, 94, 0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-weight: 500;
+  color: var(--rose);
+  backdrop-filter: blur(10px);
+}
+
+/* ── Crater cluster icons ── */
+.crater-cluster {
+  background: var(--panel-bg);
+  border: 1px solid rgba(161, 98, 7, 0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-weight: 500;
+  color: var(--brown);
+  backdrop-filter: blur(10px);
 }
 
 /* ═══════════════════════════════════════════════════
