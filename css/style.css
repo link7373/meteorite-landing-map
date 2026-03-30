@@ -29,7 +29,7 @@
 
   --brown:     #a16207;
   --brown-dim: rgba(161, 98, 7, 0.55);
-  --brown-glow:rgba(161, 98, 7, 0.20);
+  --brown-glow: rgba(161, 98, 7, 0.20);
   --brown-bg:  rgba(161, 98, 7, 0.10);
 
   --text:         #e5e5e5;
@@ -1043,6 +1043,7 @@ body.sidebar-open #sidebar { transform: translateX(0); }
   border-radius: 50%;
   border: 2px solid var(--rose);
   animation: fireball-pulse 2s ease-out infinite;
+  pointer-events: none;
 }
 @keyframes fireball-pulse {
   0%   { transform: scale(1);   opacity: 0.9; }
@@ -1071,6 +1072,7 @@ body.sidebar-open #sidebar { transform: translateX(0); }
   font-weight: 500;
   color: var(--rose);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 /* ── Crater cluster icons ── */
@@ -1085,6 +1087,7 @@ body.sidebar-open #sidebar { transform: translateX(0); }
   font-weight: 500;
   color: var(--brown);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 /* ═══════════════════════════════════════════════════
