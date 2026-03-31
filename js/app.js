@@ -212,6 +212,16 @@ document.getElementById('retry-btn').addEventListener('click', () => {
     AppState.markerLayer = null;
   }
 
+  if (AppState.fireballLayer) {
+    AppState.map.removeLayer(AppState.fireballLayer);
+    AppState.fireballLayer = null;
+  }
+
+  if (AppState.craterLayer) {
+    AppState.map.removeLayer(AppState.craterLayer);
+    AppState.craterLayer = null;
+  }
+
   init();
 });
 
