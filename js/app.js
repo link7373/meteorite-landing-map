@@ -21,6 +21,15 @@ const AppState = {
   /** id → L.CircleMarker, for O(1) lookup in search + updateMarkers */
   markerMap: new Map(),
 
+  /** CNEOS fireball records */
+  fireballs: [],
+  /** L.MarkerClusterGroup for fireballs */
+  fireballLayer: null,
+  /** Impact crater records */
+  craters: [],
+  /** L.MarkerClusterGroup for craters */
+  craterLayer: null,
+
   /** Active filter values */
   filters: {
     yearMin:      null,
@@ -140,15 +149,22 @@ function showError(err) {
 /* ── Main initialization ── */
 
 async function init() {
-  showLoading('Fetching meteorite data…');
+  showLoading('Fetching meteorite, fireball, and crater data…');
 
   try {
-    // Phase 1 — fetch + clean data
-    AppState.allMeteorites = await fetchMeteorites();
+    // Phase 1a — create the map first so initFireballs/initCraters can use AppState.map
+    AppState.map = initMap();
+
+    // Phase 1b — fetch + clean data (all three layers in parallel)
+    const [meteorites] = await Promise.all([
+      fetchMeteorites(),
+      initFireballs().catch(err => console.warn('[Fireballs] failed:', err)),
+      initCraters().catch(err => console.warn('[Craters] failed:', err)),
+    ]);
+    AppState.allMeteorites = meteorites;
     AppState.filtered      = AppState.allMeteorites;
 
-    // Phase 2 — map + markers
-    AppState.map         = initMap();
+    // Phase 2 — meteorite marker layer
     AppState.markerLayer = createMarkerLayer(AppState.allMeteorites);
     AppState.map.addLayer(AppState.markerLayer);
 
@@ -170,6 +186,12 @@ async function init() {
     // Update stats whenever the viewport changes
     AppState.map.on('moveend zoomend', refreshViewportStats);
     refreshViewportStats();
+
+    // Update fireball count in stats bar
+    if (AppState.fireballs.length) {
+      const el = document.getElementById('stat-fireballs');
+      if (el) el.textContent = AppState.fireballs.length.toLocaleString();
+    }
 
     hideLoading();
   } catch (err) {
