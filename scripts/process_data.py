@@ -13,12 +13,26 @@ Output:
 
 import json
 import os
+import time
+import urllib.error
 import urllib.request
 
 NASA_JSON_URL = (
     "https://data.nasa.gov/resource/y77d-th95.json?$limit=50000"
 )
 OUTPUT_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "meteorites.json")
+
+# Mimic a browser so NASA's CDN/WAF doesn't block server-side requests
+_HEADERS = {
+    "Accept": "application/json",
+    "User-Agent": (
+        "Mozilla/5.0 (X11; Linux x86_64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/124.0.0.0 Safari/537.36"
+    ),
+}
+_MAX_RETRIES = 3
+_BACKOFF_BASE = 10  # seconds
 
 
 def parse_year(raw):
@@ -38,11 +52,27 @@ def parse_float(raw):
         return None
 
 
+def fetch_with_retry(url):
+    """Fetch URL with retries and exponential backoff."""
+    req = urllib.request.Request(url, headers=_HEADERS)
+    for attempt in range(1, _MAX_RETRIES + 1):
+        try:
+            print(f"Attempt {attempt}/{_MAX_RETRIES}: GET {url}")
+            with urllib.request.urlopen(req, timeout=90) as resp:
+                return json.loads(resp.read().decode("utf-8"))
+        except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            print(f"Attempt {attempt} failed: {exc}")
+            if attempt < _MAX_RETRIES:
+                wait = _BACKOFF_BASE * attempt
+                print(f"Retrying in {wait}s …")
+                time.sleep(wait)
+            else:
+                raise
+
+
 def main():
     print(f"Downloading from {NASA_JSON_URL} …")
-    req = urllib.request.Request(NASA_JSON_URL, headers={"Accept": "application/json"})
-    with urllib.request.urlopen(req, timeout=60) as resp:
-        raw_records = json.loads(resp.read().decode("utf-8"))
+    raw_records = fetch_with_retry(NASA_JSON_URL)
 
     records = []
 

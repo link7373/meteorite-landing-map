@@ -21,15 +21,24 @@ jobs:
           python-version: '3.11'
 
       - name: Download and convert NASA data
+        id: download
+        continue-on-error: true
         run: python scripts/process_data.py
+
+      - name: Warn if download failed
+        if: steps.download.outcome == 'failure'
+        run: |
+          echo "::warning::NASA API download failed after retries. Skipping data update."
+          exit 0
 
       - name: Check for changes
         id: diff
+        if: steps.download.outcome == 'success'
         run: |
           git diff --quiet data/meteorites.json && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
 
       - name: Commit and push if changed
-        if: steps.diff.outputs.changed == 'true'
+        if: steps.download.outcome == 'success' && steps.diff.outputs.changed == 'true'
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
