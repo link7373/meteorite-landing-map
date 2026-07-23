@@ -211,6 +211,7 @@ async function init() {
     initSearch();
     if (typeof initClassificationGuide === 'function') initClassificationGuide();
     initTimeline(AppState.allMeteorites);
+    if (typeof initLayers === 'function') initLayers();
 
     // Update stats whenever the viewport changes
     AppState.map.on('moveend zoomend', refreshViewportStats);

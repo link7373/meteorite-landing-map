@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.css">
   <script src="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.js"></script>
 
-  <link rel="stylesheet" href="css/style.css?v=12">
+  <link rel="stylesheet" href="css/style.css?v=14">
 </head>
 <body>
 
@@ -223,6 +223,41 @@
     <ul id="search-results" role="listbox" aria-label="Search suggestions" class="search-results hidden"></ul>
   </div>
 
+  <!-- ═══ Layers + Legend Panel ═══ -->
+  <div id="layers-panel" class="layers-panel" role="group" aria-label="Map layers and legend">
+    <button id="layers-toggle" class="layers-toggle" aria-expanded="true" aria-controls="layers-list" title="Show or hide map layers">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+        <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+        <polyline points="2 17 12 22 22 17"/>
+        <polyline points="2 12 12 17 22 12"/>
+      </svg>
+      <span>Layers</span>
+    </button>
+    <ul id="layers-list" class="layers-list">
+      <li>
+        <label>
+          <input type="checkbox" data-layer="meteorites" checked>
+          <span class="layer-swatches"><span class="swatch swatch-fell" title="Fell (observed)"></span><span class="swatch swatch-found" title="Found (later discovery)"></span></span>
+          <span class="layer-name">Meteorites</span>
+        </label>
+      </li>
+      <li>
+        <label>
+          <input type="checkbox" data-layer="fireballs" checked>
+          <span class="layer-swatches"><span class="swatch swatch-fireball"></span></span>
+          <span class="layer-name">Fireballs</span>
+        </label>
+      </li>
+      <li>
+        <label>
+          <input type="checkbox" data-layer="craters" checked>
+          <span class="layer-swatches"><span class="swatch swatch-crater"></span></span>
+          <span class="layer-name">Craters</span>
+        </label>
+      </li>
+    </ul>
+  </div>
+
   <!-- Timeline Bar -->
   <div id="timeline-bar" class="timeline-bar hidden" aria-label="Timeline playback controls">
     <div class="timeline-inner">
@@ -353,6 +388,7 @@
   <script src="js/timeline.js?v=3"></script>
   <script src="js/fireballs.js?v=2"></script>
   <script src="js/craters.js?v=2"></script>
-  <script src="js/app.js?v=6"></script>
+  <script src="js/layers.js?v=1"></script>
+  <script src="js/app.js?v=7"></script>
 </body>
 </html>
