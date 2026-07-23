@@ -47,8 +47,21 @@ function buildFireballPopup(f) {
     </div>`;
 }
 
-/** Fetch + parse all CNEOS fireball records */
+/**
+ * Return all fireball records. Prefers the build-time baked file
+ * (data/fireballs.json — fast, no cross-origin dependency); falls back to a
+ * live CNEOS fetch only if the baked file is missing or unreadable.
+ */
 async function fetchFireballs() {
+  try {
+    const res = await fetch('/data/fireballs.json');
+    if (res.ok) return await res.json();
+  } catch (_) { /* fall through to live API */ }
+  return fetchFireballsLive();
+}
+
+/** Fetch + parse all CNEOS fireball records (live fallback) */
+async function fetchFireballsLive() {
   const res = await fetch(CNEOS_URL);
   if (!res.ok) throw new Error(`CNEOS API error: ${res.status}`);
   const json = await res.json();

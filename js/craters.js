@@ -54,8 +54,21 @@ function buildCraterPopup(c) {
     </div>`;
 }
 
-/** Fetch + parse all crater records */
+/**
+ * Return all crater records. Prefers the build-time baked file
+ * (data/craters.json — fast, no cross-origin dependency); falls back to a live
+ * CSV fetch only if the baked file is missing or unreadable.
+ */
 async function fetchCraters() {
+  try {
+    const res = await fetch('/data/craters.json');
+    if (res.ok) return await res.json();
+  } catch (_) { /* fall through to live CSV */ }
+  return fetchCratersLive();
+}
+
+/** Fetch + parse all crater records (live fallback) */
+async function fetchCratersLive() {
   const res = await fetch(CRATER_CSV_URL);
   if (!res.ok) throw new Error(`Crater CSV fetch error: ${res.status}`);
   const text = await res.text();
