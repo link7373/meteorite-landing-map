@@ -989,6 +989,16 @@ body.sidebar-open #sidebar { transform: translateX(0); }
   color: #aecbfa;
 }
 
+.meteorite-popup .popup-details-link {
+  display: block;
+  margin-top: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+}
+.meteorite-popup .popup-details-link:hover { text-decoration: underline; }
+
 /* ═══════════════════════════════════════════════════
    CLUSTER ICONS
    ═══════════════════════════════════════════════════ */

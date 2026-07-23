@@ -79,6 +79,7 @@ function buildPopupHTML(m) {
         </div>
       </div>
       <div class="popup-coords">${formatCoords(m.lat, m.lng)}</div>
+      ${AppState.pageIndex && AppState.pageIndex[m.id] ? `<a href="/m/${AppState.pageIndex[m.id]}.html" class="popup-details-link">Full details &rarr;</a>` : ''}
       ${m.name && m.name !== 'Unknown' ? `<a href="https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(m.name)}+meteorite&mkcid=1&mkrid=711-53200-19255-0&siteid=0&campid=5339144154&toolid=10001" target="_blank" rel="noopener noreferrer" class="ebay-link">🛒 Find specimens on eBay</a>` : ''}
     </div>
   `.trim();

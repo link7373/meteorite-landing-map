@@ -38,6 +38,15 @@ function readURLParams() {
 }
 
 /**
+ * Read the `focus` param — a meteorite id to fly to on load (used by the
+ * generated SEO detail pages' "View on the interactive map" link).
+ * Returns the id string, or null.
+ */
+function readFocusParam() {
+  return new URLSearchParams(window.location.search).get('focus');
+}
+
+/**
  * Write current filter state to the URL (no page reload).
  */
 function writeURLParams(filters) {

@@ -30,6 +30,9 @@ const AppState = {
   /** L.MarkerClusterGroup for craters */
   craterLayer: null,
 
+  /** { meteorite id -> detail-page slug } for meteorites that have an SEO page */
+  pageIndex: {},
+
   /** Active filter values */
   filters: {
     yearMin:      null,
@@ -60,6 +63,15 @@ function getViewportMeteorites() {
 
 function refreshViewportStats() {
   updateStats(getViewportMeteorites(), AppState.filtered.length);
+}
+
+/* ── Page index (id -> SEO detail-page slug) ── */
+async function fetchPageIndex() {
+  try {
+    const res = await fetch('/data/page_index.json');
+    if (res.ok) return await res.json();
+  } catch (_) { /* optional — popups just omit the details link */ }
+  return {};
 }
 
 /* ── Toast helper ── */
@@ -93,6 +105,21 @@ function surpriseMe() {
       setTimeout(() => marker.openPopup(), 200);
     });
   }, 1400);
+}
+
+/* ── Focus a meteorite by id (deep-link target from SEO pages) ──
+   Uses zoomToShowLayer so a clustered marker is de-clustered before the
+   popup opens — a plain openPopup() no-ops while the marker is in a cluster. */
+function focusMeteorite(id) {
+  const m      = AppState.allMeteorites.find(x => x.id === id);
+  const marker = AppState.markerMap.get(id);
+  if (!m || !marker) return;
+  AppState.map.flyTo([m.lat, m.lng], 8, { animate: true, duration: 1.2 });
+  setTimeout(() => {
+    AppState.markerLayer.zoomToShowLayer(marker, () => {
+      setTimeout(() => marker.openPopup(), 200);
+    });
+  }, 1350);
 }
 
 /* ── About Modal ── */
@@ -155,14 +182,16 @@ async function init() {
     // Phase 1a — create the map first so initFireballs/initCraters can use AppState.map
     AppState.map = initMap();
 
-    // Phase 1b — fetch + clean data (all three layers in parallel)
-    const [meteorites] = await Promise.all([
+    // Phase 1b — fetch + clean data (all layers + page index in parallel)
+    const [meteorites, pageIndex] = await Promise.all([
       fetchMeteorites(),
+      fetchPageIndex(),
       initFireballs().catch(err => console.warn('[Fireballs] failed:', err)),
       initCraters().catch(err => console.warn('[Craters] failed:', err)),
     ]);
     AppState.allMeteorites = meteorites;
     AppState.filtered      = AppState.allMeteorites;
+    AppState.pageIndex     = pageIndex || {};
 
     // Phase 2 — meteorite marker layer
     AppState.markerLayer = createMarkerLayer(AppState.allMeteorites);
@@ -192,6 +221,10 @@ async function init() {
       const el = document.getElementById('stat-fireballs');
       if (el) el.textContent = AppState.fireballs.length.toLocaleString();
     }
+
+    // Deep-link: fly to a specific meteorite (?focus=<id>) — used by SEO pages
+    const focusId = typeof readFocusParam === 'function' ? readFocusParam() : null;
+    if (focusId) setTimeout(() => focusMeteorite(focusId), 600);
 
     hideLoading();
   } catch (err) {
