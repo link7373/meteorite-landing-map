@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """
-Download the NASA meteorite landings JSON and regenerate data/meteorites.json.
+Download the NASA meteorite landings CSV and regenerate data/meteorites.json.
 
-Uses the same Socrata JSON endpoint as the browser app.
+NASA migrated data.nasa.gov from Socrata to CKAN in 2025, retiring the old
+`/resource/y77d-th95.json` Socrata API (it now 404s). The dataset itself is
+frozen (last landing ~2013) and NASA now serves it as a static "legacy" CSV.
+This script targets that CSV. Fresh post-2013 records come from a separate
+MetBull step; see scripts/build_meteorites.py.
 
 Usage:
   python scripts/process_data.py
@@ -11,20 +15,22 @@ Output:
   data/meteorites.json
 """
 
+import csv
+import io
 import json
 import os
 import time
 import urllib.error
 import urllib.request
 
-NASA_JSON_URL = (
-    "https://data.nasa.gov/resource/y77d-th95.json?$limit=50000"
+NASA_CSV_URL = (
+    "https://data.nasa.gov/docs/legacy/meteorite_landings/Meteorite_Landings.csv"
 )
 OUTPUT_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "meteorites.json")
 
 # Mimic a browser so NASA's CDN/WAF doesn't block server-side requests
 _HEADERS = {
-    "Accept": "application/json",
+    "Accept": "text/csv,*/*",
     "User-Agent": (
         "Mozilla/5.0 (X11; Linux x86_64) "
         "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -53,13 +59,13 @@ def parse_float(raw):
 
 
 def fetch_with_retry(url):
-    """Fetch URL with retries and exponential backoff."""
+    """Fetch URL with retries and exponential backoff; return decoded text."""
     req = urllib.request.Request(url, headers=_HEADERS)
     for attempt in range(1, _MAX_RETRIES + 1):
         try:
             print(f"Attempt {attempt}/{_MAX_RETRIES}: GET {url}")
             with urllib.request.urlopen(req, timeout=90) as resp:
-                return json.loads(resp.read().decode("utf-8"))
+                return resp.read().decode("utf-8", errors="replace")
         except (urllib.error.URLError, TimeoutError, OSError) as exc:
             print(f"Attempt {attempt} failed: {exc}")
             if attempt < _MAX_RETRIES:
@@ -71,14 +77,15 @@ def fetch_with_retry(url):
 
 
 def main():
-    print(f"Downloading from {NASA_JSON_URL} …")
-    raw_records = fetch_with_retry(NASA_JSON_URL)
+    print(f"Downloading from {NASA_CSV_URL} …")
+    raw_text = fetch_with_retry(NASA_CSV_URL)
 
+    reader = csv.DictReader(io.StringIO(raw_text))
     records = []
 
-    for row in raw_records:
+    for row in reader:
         # Filter: Valid nametypes only
-        if row.get("nametype", "").strip() != "Valid":
+        if (row.get("nametype") or "").strip() != "Valid":
             continue
 
         lat = parse_float(row.get("reclat"))
@@ -90,15 +97,16 @@ def main():
         if lat == 0.0 and lng == 0.0:
             continue
 
-        mass = parse_float(row.get("mass"))
+        # NASA CSV uses "mass (g)" for the mass column
+        mass = parse_float(row.get("mass (g)") or row.get("mass"))
         year = parse_year(row.get("year"))
 
         records.append({
             "id":       str(row.get("id", "")).strip(),
-            "name":     row.get("name", "").strip(),
-            "recclass": row.get("recclass", "").strip(),
+            "name":     (row.get("name") or "").strip(),
+            "recclass": (row.get("recclass") or "").strip(),
             "mass":     mass,
-            "fall":     row.get("fall", "").strip(),
+            "fall":     (row.get("fall") or "").strip(),
             "year":     year,
             "lat":      lat,
             "lng":      lng,

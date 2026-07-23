@@ -54,6 +54,10 @@ async function fetchFireballs() {
   const json = await res.json();
 
   const fields = json.fields;
+  const data   = json.data;
+  if (!Array.isArray(fields) || !Array.isArray(data)) {
+    throw new Error('CNEOS API returned unexpected shape');
+  }
   const dateIdx    = fields.indexOf('date');
   const energyIdx  = fields.indexOf('energy');
   const impactIdx  = fields.indexOf('impact-e');
@@ -65,7 +69,7 @@ async function fetchFireballs() {
   const velIdx     = fields.indexOf('vel');
 
   const result = [];
-  for (const row of json.data) {
+  for (const row of data) {
     const coords = parseFireballCoords(row[latIdx], row[latDirIdx], row[lonIdx], row[lonDirIdx]);
     if (!coords) continue;
     result.push({
