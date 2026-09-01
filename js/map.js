@@ -17,11 +17,14 @@ function initMap() {
     preferCanvas: false, // CircleMarker works better with SVG for popups
   });
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  // CARTO now requires an API key for its basemap tiles. Dark Matter style
+  // keeps the dark-space aesthetic; the key is a client-side basemap key
+  // (safe to ship, but lock it to this domain in the CARTO dashboard).
+  const CARTO_KEY = 'cb1_2qwk_1_029ded84bd641e1954ed765c';
+  L.tileLayer(`https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png?key=${CARTO_KEY}`, {
     attribution:
       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors ' +
       '&copy; <a href="https://carto.com/attributions">CARTO</a>',
-    subdomains: 'abcd',
     maxZoom: 19,
   }).addTo(map);
 
