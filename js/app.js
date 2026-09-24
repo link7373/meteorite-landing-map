@@ -212,6 +212,7 @@ async function init() {
     if (typeof initClassificationGuide === 'function') initClassificationGuide();
     initTimeline(AppState.allMeteorites);
     if (typeof initLayers === 'function') initLayers();
+    if (typeof initNearby === 'function') initNearby();
 
     // Update stats whenever the viewport changes
     AppState.map.on('moveend zoomend', refreshViewportStats);

@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.css">
   <script src="https://cdn.jsdelivr.net/npm/nouislider@15.7.1/dist/nouislider.min.js"></script>
 
-  <link rel="stylesheet" href="css/style.css?v=14">
+  <link rel="stylesheet" href="css/style.css?v=17">
 </head>
 <body>
 
@@ -289,6 +289,38 @@
     </svg>
   </button>
 
+  <!-- Near Me Button -->
+  <button id="near-btn" aria-label="Find meteorites near me" title="Near me" aria-pressed="false" aria-controls="near-panel">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/>
+      <circle cx="12" cy="9.5" r="2.5"/>
+    </svg>
+  </button>
+
+  <!-- Near Me Panel -->
+  <section id="near-panel" class="near-panel hidden" aria-hidden="true" aria-labelledby="near-title">
+    <div id="near-header" class="near-header">
+      <h2 id="near-title" class="near-title">Near you</h2>
+      <button id="near-close" class="near-close" aria-label="Close nearby panel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="near-controls">
+      <div id="near-radius" class="near-radius" role="group" aria-label="Search radius">
+        <button data-r="50" aria-pressed="false">50 km</button>
+        <button data-r="250" class="active" aria-pressed="true">250 km</button>
+        <button data-r="1000" aria-pressed="false">1,000 km</button>
+      </div>
+      <div class="near-actions">
+        <button id="near-recenter" class="near-link-btn" title="Search around the current map center">Use map center</button>
+        <button id="near-share" class="near-link-btn" title="Copy a link to this search">Copy link</button>
+      </div>
+    </div>
+    <div id="near-body" class="near-body" aria-live="polite"></div>
+  </section>
+
   <!-- Timeline Toggle -->
   <button id="timeline-toggle" aria-label="Toggle timeline animation" title="Timeline" aria-pressed="false">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
@@ -389,6 +421,7 @@
   <script src="js/fireballs.js?v=2"></script>
   <script src="js/craters.js?v=2"></script>
   <script src="js/layers.js?v=1"></script>
-  <script src="js/app.js?v=7"></script>
+  <script src="js/nearby.js?v=3"></script>
+  <script src="js/app.js?v=8"></script>
 </body>
 </html>
