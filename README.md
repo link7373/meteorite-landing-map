@@ -16,6 +16,8 @@ Visualizes 45,000+ meteorite landings from NASA's open dataset. Filter by year, 
 - **Filter panel** — year range slider, mass categories, fall type, classification
 - **Live stats bar** — visible count, heaviest & oldest meteorite, fell/found breakdown
 - **Search** — name autocomplete with fly-to animation and popup
+- **Near me** — geolocate (or use the map center) to list the nearest meteorites, fireballs, and craters; shareable via `?near=lat,lng&r=km`
+- **Detail pages** — generated SEO pages with a locator map, in-context facts, and nearby / same-class links (`scripts/generate_pages.py`)
 
 ## Tech Stack
 
