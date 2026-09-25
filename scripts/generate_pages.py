@@ -21,6 +21,9 @@ Outputs (all under the repo root so Cloudflare serves them as-is):
   robots.txt               allows crawling, points at the sitemap
   data/page_index.json     { meteorite id -> slug } so map popups can deep-link
 
+Cloudflare serves pages at extensionless URLs (/m/aachen.html 307s to /m/aachen),
+so every canonical, sitemap entry, and internal link uses the clean form.
+
 Usage:
   python scripts/generate_pages.py
 """
@@ -234,7 +237,7 @@ PAGE = """<!DOCTYPE html>
 <body>
 <main class="detail">
 <nav class="crumbs" aria-label="Breadcrumb">
-<a href="/">Meteorite Map</a> <span>/</span> <a href="/directory.html">{section_label}</a> <span>/</span> <span>{name}</span>
+<a href="/">Meteorite Map</a> <span>/</span> <a href="/directory">{section_label}</a> <span>/</span> <span>{name}</span>
 </nav>
 <span class="badge {badge_cls}">{badge}</span>
 <h1>{name}</h1>
@@ -314,7 +317,7 @@ def meteorite_page(m, slug, ctx):
                      f"a lone record for the area.")
     if ctx["near_craters"]:
         d, c, cslug = ctx["near_craters"][0]
-        lines.append(f'The nearest confirmed impact crater, <a href="/crater/{cslug}.html">{e(c["crater_name"])}</a>, '
+        lines.append(f'The nearest confirmed impact crater, <a href="/crater/{cslug}">{e(c["crater_name"])}</a>, '
                      f"lies {fmt_km(d)} away.")
 
     context = minimap(m["lat"], m["lng"], "fell" if fell else "found", ctx["map_points"]) + context_section(lines)
@@ -323,10 +326,10 @@ def meteorite_page(m, slug, ctx):
     related = []
     if ctx["neighbours"]:
         related.append('<section class="related"><h2>Nearby meteorites</h2>' + link_rows(
-            [(f"/m/{ns}.html", n["name"], met_sub(n), fmt_km(d)) for d, n, ns in ctx["neighbours"]]) + "</section>")
+            [(f"/m/{ns}", n["name"], met_sub(n), fmt_km(d)) for d, n, ns in ctx["neighbours"]]) + "</section>")
     if ctx["same_class"]:
         related.append(f'<section class="related"><h2>{e(ctx["same_class_label"])}</h2>' + link_rows(
-            [(f"/m/{ns}.html", n["name"], met_sub(n), "") for n, ns in ctx["same_class"]]) + "</section>")
+            [(f"/m/{ns}", n["name"], met_sub(n), "") for n, ns in ctx["same_class"]]) + "</section>")
 
     props = [{"@type": "PropertyValue", "name": "Classification", "value": m["recclass"]},
              {"@type": "PropertyValue", "name": "Fall type", "value": "Observed fall" if fell else "Find"}]
@@ -340,21 +343,21 @@ def meteorite_page(m, slug, ctx):
         "@graph": [
             {"@type": "Place", "name": f"{name} meteorite",
              "additionalType": "https://en.wikipedia.org/wiki/Meteorite",
-             "url": f"{SITE}/m/{slug}.html",
+             "url": f"{SITE}/m/{slug}",
              "description": lede,
              "geo": {"@type": "GeoCoordinates", "latitude": m["lat"], "longitude": m["lng"]},
              "additionalProperty": props},
             {"@type": "BreadcrumbList", "itemListElement": [
                 {"@type": "ListItem", "position": 1, "name": "Meteorite Map", "item": SITE + "/"},
-                {"@type": "ListItem", "position": 2, "name": "Meteorites", "item": SITE + "/directory.html"},
-                {"@type": "ListItem", "position": 3, "name": name, "item": f"{SITE}/m/{slug}.html"},
+                {"@type": "ListItem", "position": 2, "name": "Meteorites", "item": SITE + "/directory"},
+                {"@type": "ListItem", "position": 3, "name": name, "item": f"{SITE}/m/{slug}"},
             ]},
         ],
     }, ensure_ascii=False)
 
     return PAGE.format(
         title=e(f"{name} Meteorite — {m['recclass']}, {fmt_mass(m['mass'])}"),
-        desc=e(desc), canonical=f"{SITE}/m/{slug}.html",
+        desc=e(desc), canonical=f"{SITE}/m/{slug}",
         jsonld=jsonld, section_label="Meteorites", name=e(name),
         badge_cls="fell" if fell else "found", badge="Fell" if fell else "Found",
         lede=e(lede), facts=facts, context=context, class_block=class_block,
@@ -402,23 +405,23 @@ def crater_page(c, slug, ctx):
     related = []
     if ctx["near_craters"]:
         related.append('<section class="related"><h2>Nearby impact craters</h2>' + link_rows(
-            [(f"/crater/{cs}.html", k["crater_name"],
+            [(f"/crater/{cs}", k["crater_name"],
               f"{k['diameter_km']} km wide" if k.get("diameter_km") else "Impact crater", fmt_km(d))
              for d, k, cs in ctx["near_craters"]]) + "</section>")
     if ctx["neighbours"]:
         related.append('<section class="related"><h2>Nearby meteorites</h2>' + link_rows(
-            [(f"/m/{ns}.html", n["name"], met_sub(n), fmt_km(d)) for d, n, ns in ctx["neighbours"]]) + "</section>")
+            [(f"/m/{ns}", n["name"], met_sub(n), fmt_km(d)) for d, n, ns in ctx["neighbours"]]) + "</section>")
 
     jsonld = json.dumps({
         "@context": "https://schema.org",
         "@graph": [
             {"@type": "Landform", "name": name, "description": lede,
-             "url": f"{SITE}/crater/{slug}.html",
+             "url": f"{SITE}/crater/{slug}",
              "geo": {"@type": "GeoCoordinates", "latitude": c["lat"], "longitude": c["lng"]}},
             {"@type": "BreadcrumbList", "itemListElement": [
                 {"@type": "ListItem", "position": 1, "name": "Meteorite Map", "item": SITE + "/"},
-                {"@type": "ListItem", "position": 2, "name": "Impact Craters", "item": SITE + "/directory.html"},
-                {"@type": "ListItem", "position": 3, "name": name, "item": f"{SITE}/crater/{slug}.html"},
+                {"@type": "ListItem", "position": 2, "name": "Impact Craters", "item": SITE + "/directory"},
+                {"@type": "ListItem", "position": 3, "name": name, "item": f"{SITE}/crater/{slug}"},
             ]},
         ],
     }, ensure_ascii=False)
@@ -430,7 +433,7 @@ def crater_page(c, slug, ctx):
 
     return PAGE.format(
         title=e(f"{name} Impact Crater — {diam}, {c.get('country') or 'location unknown'}"),
-        desc=e(desc), canonical=f"{SITE}/crater/{slug}.html",
+        desc=e(desc), canonical=f"{SITE}/crater/{slug}",
         jsonld=jsonld, section_label="Impact Craters", name=e(name),
         badge_cls="crater", badge="Crater", lede=e(lede), facts=facts,
         context=context, class_block="", related="\n".join(related),
@@ -570,14 +573,14 @@ def main():
     finds = [x for x in met_entries if not x[2]]
 
     def link_list(items, base):
-        return "\n".join(f'<li><a href="/{base}/{s}.html">{e(n)}</a></li>' for n, s, *_ in items)
+        return "\n".join(f'<li><a href="/{base}/{s}">{e(n)}</a></li>' for n, s, *_ in items)
 
     directory = f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Directory — All Meteorites &amp; Impact Craters | Meteorite Map</title>
 <meta name="description" content="Browse every documented meteorite fall, notable find, and confirmed impact crater on wheretheyfall.com.">
-<link rel="canonical" href="{SITE}/directory.html">
+<link rel="canonical" href="{SITE}/directory">
 <link rel="icon" type="image/svg+xml" href="/img/favicon.svg">
 <link rel="stylesheet" href="/css/detail.css">
 </head><body>
@@ -599,9 +602,9 @@ def main():
     write("directory.html", directory)
 
     # ── Sitemap + robots ──
-    urls = [f"{SITE}/", f"{SITE}/directory.html"]
-    urls += [f"{SITE}/m/{s}.html" for _, s, *_ in met_entries]
-    urls += [f"{SITE}/crater/{s}.html" for _, s in crater_entries]
+    urls = [f"{SITE}/", f"{SITE}/directory"]
+    urls += [f"{SITE}/m/{s}" for _, s, *_ in met_entries]
+    urls += [f"{SITE}/crater/{s}" for _, s in crater_entries]
     sm = ('<?xml version="1.0" encoding="UTF-8"?>\n'
           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
           + "".join(f"<url><loc>{u}</loc></url>\n" for u in urls)
