@@ -1,13 +1,18 @@
-name: Update meteorite data
+name: Update data and pages
 
 on:
   schedule:
     - cron: '0 2 1 * *'   # 02:00 UTC on the 1st of every month
   workflow_dispatch:        # allow manual trigger from GitHub UI
 
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: write       # needed to commit and push
 
@@ -20,29 +25,43 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Download and convert NASA data
-        id: download
+      # Each upstream is optional: a failed download keeps the committed
+      # file, and the pages are regenerated from whatever data is on disk.
+      - name: Download NASA meteorite data
+        id: meteorites
         continue-on-error: true
         run: python scripts/process_data.py
 
-      - name: Warn if download failed
-        if: steps.download.outcome == 'failure'
+      - name: Bake fireball + crater layers
+        id: layers
+        continue-on-error: true
+        run: python scripts/bake_layers.py
+
+      - name: Warn about failed downloads
+        if: steps.meteorites.outcome == 'failure' || steps.layers.outcome == 'failure'
         run: |
-          echo "::warning::NASA API download failed after retries. Skipping data update."
+          [ "${{ steps.meteorites.outcome }}" = "failure" ] && echo "::warning::NASA meteorite download failed; keeping committed data/meteorites.json."
+          [ "${{ steps.layers.outcome }}" = "failure" ] && echo "::warning::Fireball/crater bake failed; keeping committed layer data."
           exit 0
 
-      - name: Check for changes
-        id: diff
-        if: steps.download.outcome == 'success'
-        run: |
-          git diff --quiet data/meteorites.json && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
+      # Fails the job (no commit) if generation breaks — better than
+      # pushing a half-written site.
+      - name: Regenerate detail pages, directory, and sitemap
+        run: python scripts/generate_pages.py
 
-      - name: Commit and push if changed
-        if: steps.download.outcome == 'success' && steps.diff.outputs.changed == 'true'
+      - name: Commit and push if anything changed
         run: |
+          git add data/ m/ crater/ directory.html sitemap.xml robots.txt
+          if git diff --cached --quiet; then
+            echo "No changes."
+            exit 0
+          fi
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          RECORDS=$(python -c "import json; d=json.load(open('data/meteorites.json')); print(len(d))")
-          git add data/meteorites.json
-          git commit -m "chore: update meteorite data (${RECORDS} records) [skip ci]"
+          RECORDS=$(python -c "import json; print(len(json.load(open('data/meteorites.json'))))")
+          FIREBALLS=$(python -c "import json; print(len(json.load(open('data/fireballs.json'))))")
+          PAGES=$(git diff --cached --name-only -- m/ crater/ | wc -l)
+          # No [skip ci]: the Cloudflare build must run to deploy this commit.
+          git commit -m "chore: monthly data refresh (${RECORDS} meteorites, ${FIREBALLS} fireballs, ${PAGES} pages changed)"
           git push
+          echo "Committed: ${RECORDS} meteorites, ${FIREBALLS} fireballs, ${PAGES} pages changed." >> "$GITHUB_STEP_SUMMARY"
